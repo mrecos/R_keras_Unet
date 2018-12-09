@@ -1,0 +1,34 @@
+default:
+    IMAGE_SIZE: 224
+    N_CHANNELS: 4
+    USE_HILL: True
+    NORM_IMAGES: True
+    NUM_CLASSES: 1
+
+    EPOCHS: 5
+    N_STEPS: 1
+    BATCH_SIZE: 2
+    DROPOUT: 0.20
+
+    AMT_TRAIN: 280
+    AMT_VAL: 50
+
+    TRAIN_DIR: 'C:\\Users\\matthew.d.harris\\UNET_MRCNN_IMAGERY\\OUTPUT\\SARA_ALL_4chan_tif_1ft_train'   # <- model train folder
+    VAL_DIR:   'C:\\Users\\matthew.d.harris\\UNET_MRCNN_IMAGERY\\OUTPUT\\SARA_ALL_4chan_tif_1ft_test'    # <- model validation folder
+    SAVE_WEIGHTS_DIR: 'C:\\Users\\matthew.d.harris\\ZF_UNET_224\\weights'
+
+    # Maximum number of ground truth instances to use in one image
+    MAX_GT_INSTANCES: 1 #MDH
+
+    # Image mean (RGB)
+    MEAN_PIXEL: c(90, 91, 70, 141)
+    VARIANCE:   c(3587, 3146, 2022, 6594)
+    
+    IMAGES_PER_GPU: 2
+    GPU_COUNT: 1
+    
+testing:
+  EPOCHS: 1
+  N_STEPS: 1
+  AMT_TRAIN: 10
+  AMT_VAL: 5
