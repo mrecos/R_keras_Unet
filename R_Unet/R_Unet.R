@@ -23,7 +23,7 @@ bce_dice_loss <- function(y_true, y_pred) {
 
 # U-net 128 -----------------------------------------------------
 
-get_unet_128 <- function(input_shape = c(1024, 1024, 3),
+get_unet_128 <- function(input_shape = c(128, 128, 3),
                          num_classes = 1) {
   
   inputs <- layer_input(shape = input_shape)
@@ -157,5 +157,3 @@ get_unet_128 <- function(input_shape = c(1024, 1024, 3),
   
   return(model)
 }
-
-model <- get_unet_128()
