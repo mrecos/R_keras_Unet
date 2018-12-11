@@ -80,7 +80,7 @@ model %>% evaluate_generator(train_infinite_iterator, steps = 5)
 
 predict_batch <- as.matrix(predict_generator()[[1]])
 preds <- model %>% predict(predict_batch, steps = 1)
-plot_pred_tensor_overlay(preds, predict_batch, 9, alpha = 0.45, mask=TRUE)
+plot_pred_tensor_overlay(preds, predict_batch, 10, alpha = 0.45, mask=FALSE)
 
  
 
