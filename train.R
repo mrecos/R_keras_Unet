@@ -15,41 +15,8 @@ source(file = "./R_Unet/R_Unet.R")
 model <- get_unet_128(input_shape = c(config$IMAGE_SIZE, config$IMAGE_SIZE, config$N_CHANNELS),
                       num_classes = config$NUM_CLASSES)
 
-#train_samples <- 5088
-# not the right approach, but a band-aid while combining code
-train_index <- sample(1:config$AMT_TRAIN, round(config$AMT_TRAIN * 0.8)) # 80%
-val_index <- c(1:config$AMT_TRAIN)[-train_index]
-
 
 #### TESTING AREA train_generator step through
-images_iter <- list.files(config$TRAIN_IMG, 
-                          pattern = ".tif", 
-                          full.names = TRUE)[train_index] # for current epoch
-images_all <- list.files(config$TRAIN_IMG, 
-                         pattern = ".tif",
-                         full.names = TRUE)[train_index]  # for next epoch
-masks_iter <- list.files(config$TRAIN_MSK, 
-                         pattern = paste0(config$CLASS_NAME,".tif"),
-                         full.names = TRUE)[train_index] # for current epoch
-masks_all <- list.files(config$TRAIN_MSK, 
-                        pattern = paste0(config$CLASS_NAME,".tif"),
-                        full.names = TRUE)[train_index] # for next epoch
-
-
-# this is the generator process, works, but not respecting target class and other things
-train_test <- train_generator(images_dir = config$TRAIN_IMG,
-                masks_dir  = config$TRAIN_MSK,
-                samples_index = train_index,
-                batch_size = config$BATCH_SIZE,
-                class_name = config$CLASS_NAME)
-batch_test <- train_test()
-image_test <- as.matrix(batch_test[[1]])
-plot(as.raster(image_test[1,,,]))
-# rasterImage(as.raster(image_test[1,,,]),0,0,128,128)
-mask_test <- as.matrix(batch_test[[2]])
-plot(as.raster(mask_test[1,,,]))
-# rasterImage(as.raster(mask_test[1,,,]),0,0,128,128, alpha = 0.5)
-
 ### testing infinite generator
 inf_test <- train_infinite_generator(image_path = config$TRAIN_IMG,
                                      mask_path  = config$TRAIN_MSK,
@@ -62,27 +29,18 @@ plot(as.raster(image_test[1,,,]))
 mask_test <- as.matrix(inf_batch[[2]])
 plot(as.raster(mask_test[1,,,]))
 # rasterImage(as.raster(mask_test[1,,,]),0,0,128,128, alpha = 0.5)
-#########
+###### END TESTING ###
 
 
-train_iterator <- py_iterator(train_generator(images_dir = config$TRAIN_IMG,
-                                              masks_dir  = config$TRAIN_MSK,
-                                              samples_index = train_index,
-                                              batch_size = config$BATCH_SIZE,
-                                              class_name = config$CLASS_NAME))
-
+# Create Interators ---------------------------------------------
 train_infinite_iterator <- py_iterator(train_infinite_generator(image_path = config$TRAIN_IMG,
                                                                 mask_path  = config$TRAIN_MSK,
                                                                 image_size = config$IMAGE_SIZE,
                                                                 batch_size = config$BATCH_SIZE))
-
-val_iterator <- py_iterator(val_generator(images_dir = config$VAL_IMG,
-                                          masks_dir = config$VAL_MSK,
-                                          samples_index = val_index,
-                                          batch_size = config$BATCH_SIZE,
-                                          class_name = config$CLASS_NAME))
-
-
+predict_generator <- train_infinite_generator(image_path = config$TRAIN_IMG,
+                                              mask_path  = config$TRAIN_MSK,
+                                              image_size = config$IMAGE_SIZE,
+                                              batch_size = 10)
 # Training -----------------------------------------------------
 
 tensorboard("logs_r")
@@ -107,17 +65,6 @@ callbacks_list <- list(
                             mode = "max" )
 )
 
-## fit with chip iterator
-# history <- model %>% fit_generator(
-#   train_iterator,
-#   steps_per_epoch = as.integer(length(train_index) / config$BATCH_SIZE), 
-#   epochs = config$EPOCHS, 
-#   validation_data = val_iterator,
-#   validation_steps = as.integer(length(val_index) / config$BATCH_SIZE),
-#   verbose = 1,
-#   callbacks = callbacks_list
-# )
-
 # fit with infinite generator
 history <- model %>% fit_generator(
   train_infinite_iterator,
@@ -129,7 +76,12 @@ history <- model %>% fit_generator(
   callbacks = callbacks_list
 )
 
-model %>% evaluate_generator(val_iterator, steps = 5)
+model %>% evaluate_generator(train_infinite_iterator, steps = 5)
 
-preds <- model %>% predict(batch_test[[1]], steps = 1)
-plot(as.raster(preds[1,,,]))
+predict_batch <- as.matrix(predict_generator()[[1]])
+preds <- model %>% predict(predict_batch, steps = 1)
+plot_pred_tensor_overlay(preds, predict_batch, 9, alpha = 0.45, mask=TRUE)
+
+ 
+
+     

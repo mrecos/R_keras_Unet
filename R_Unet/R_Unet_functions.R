@@ -7,42 +7,42 @@ fullImagesRead <- function(image_file,
   return(list(img = img, mask = mask))
 }
 
-imagesRead <- function(image_file,
-                       mask_file,
-                       target_width = 128, 
-                       target_height = 128) {
-  img <- image_read(image_file)
-  img <- image_scale(img, paste0(target_width, "x", target_height, "!"))
-  
-  mask <- image_read(mask_file)
-  mask <- image_scale(mask, paste0(target_width, "x", target_height, "!"))
-  return(list(img = img, mask = mask))
-}
+# imagesRead <- function(image_file,
+#                        mask_file,
+#                        target_width = 128, 
+#                        target_height = 128) {
+#   img <- image_read(image_file)
+#   img <- image_scale(img, paste0(target_width, "x", target_height, "!"))
+#   
+#   mask <- image_read(mask_file)
+#   mask <- image_scale(mask, paste0(target_width, "x", target_height, "!"))
+#   return(list(img = img, mask = mask))
+# }
 
-randomBSH <- function(img,
-                      u = 0,
-                      brightness_shift_lim = c(90, 110), # percentage
-                      saturation_shift_lim = c(95, 105), # of current value
-                      hue_shift_lim = c(80, 120)) {
-  
-  if (rnorm(1) < u) return(img)
-  
-  brightness_shift <- runif(1, 
-                            brightness_shift_lim[1], 
-                            brightness_shift_lim[2])
-  saturation_shift <- runif(1, 
-                            saturation_shift_lim[1], 
-                            saturation_shift_lim[2])
-  hue_shift <- runif(1, 
-                     hue_shift_lim[1], 
-                     hue_shift_lim[2])
-  
-  img <- image_modulate(img, 
-                        brightness = brightness_shift, 
-                        saturation =  saturation_shift, 
-                        hue = hue_shift)
-  img
-}
+# randomBSH <- function(img,
+#                       u = 0,
+#                       brightness_shift_lim = c(90, 110), # percentage
+#                       saturation_shift_lim = c(95, 105), # of current value
+#                       hue_shift_lim = c(80, 120)) {
+#   
+#   if (rnorm(1) < u) return(img)
+#   
+#   brightness_shift <- runif(1, 
+#                             brightness_shift_lim[1], 
+#                             brightness_shift_lim[2])
+#   saturation_shift <- runif(1, 
+#                             saturation_shift_lim[1], 
+#                             saturation_shift_lim[2])
+#   hue_shift <- runif(1, 
+#                      hue_shift_lim[1], 
+#                      hue_shift_lim[2])
+#   
+#   img <- image_modulate(img, 
+#                         brightness = brightness_shift, 
+#                         saturation =  saturation_shift, 
+#                         hue = hue_shift)
+#   img
+# }
 
 img2arr <- function(image, 
                     target_width = 128,
@@ -91,8 +91,8 @@ train_infinite_generator <- function(image_path,
       #x_y_imgs$img <- randomBSH(x_y_imgs$img)
       
       # return as arrays
-      x_y_arr <- list(x = img2arr(x_chip),
-                      y = mask2arr(y_chip))
+      x_y_arr <- list(x = img2arr(x_chip, target_width=image_size, target_height=image_size),
+                      y = mask2arr(y_chip, target_width=image_size, target_height=image_size))
     }
     
     x_y_batch <- purrr::transpose(x_y_batch)
@@ -218,4 +218,39 @@ val_generator <- function(images_dir,
                    keras_array(y_batch))
     return(result)
   }
+}
+
+#  Plotting functions ---------------------------------------------
+
+plot_pred_tensor_overlay <- function(prediction, actual, indx = 1, cnfg = config, 
+                                     alpha = 0.5, mask = FALSE, mask_threshold = 0.5,
+                                     viridis_option = "D"){
+  library("ggplot2")
+  library("raster")
+  library("grid")  
+  
+  pred   <- prediction[indx,,,]
+  actual <- actual[indx,,,]
+  
+  pred_df <- raster::raster(pred, xmn=0, xmx=cnfg$IMAGE_SIZE, 
+                            ymn=0, ymx=cnfg$IMAGE_SIZE)
+  pred_df <- as(pred_df, "SpatialPixelsDataFrame")
+  pred_df <- as.data.frame(pred_df)
+  
+  if(isTRUE(mask)){
+    pred_df[which(pred_df$layer >= mask_threshold),"layer"] <- 1
+    pred_df[which(pred_df$layer < mask_threshold),"layer"]  <- NA
+  }
+  
+  p <- ggplot() +  
+    annotation_custom(grid::rasterGrob(actual),
+                      xmin=0, xmax=cnfg$IMAGE_SIZE,
+                      ymin=0, ymax=cnfg$IMAGE_SIZE) +
+    geom_tile(data=pred_df, aes(x=x, y=y, fill=layer), alpha=alpha) + 
+    scale_fill_viridis_c(name="prob", na.value=NA, limits = c(0,1), option = viridis_option) +
+    coord_equal() +
+    theme_void() +
+    theme(legend.position="bottom") +
+    theme(legend.key.width=unit(2, "cm"))
+  return(p)
 }

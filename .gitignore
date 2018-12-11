@@ -3,4 +3,5 @@
 .RData
 .Ruserdata
 /logs_r
+/weights_r
 

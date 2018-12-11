@@ -38,8 +38,9 @@ default:
     GPU_COUNT: 1
     
 testing:
-  EPOCHS: 1
+  IMAGE_SIZE: 224
+  EPOCHS: 5
   N_STEPS: 1
   BATCH_SIZE: 2
-  AMT_TRAIN: 100
-  AMT_VAL: 30
+  AMT_TRAIN: 200
+  AMT_VAL: 50
