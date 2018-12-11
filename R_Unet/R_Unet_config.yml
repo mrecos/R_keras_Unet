@@ -31,7 +31,7 @@ default:
     GPU_COUNT: 1
     
 testing:
-  EPOCHS: 10
+  EPOCHS: 40
   N_STEPS: 1
-  AMT_TRAIN: 50
-  AMT_VAL: 10
+  AMT_TRAIN: 280
+  AMT_VAL: 50
