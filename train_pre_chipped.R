@@ -1,3 +1,13 @@
+##########################
+# Title:  Fit Unet model on existing image tiles (chips)
+# Inputs: config file, unet model, functions, test & train dirs for existing image tiles
+# Ouputs: trained Unet model, logs, some visualization
+# Status: Working / Put on hold / not developing
+# Notes:  This is the first pass at training Unet with existing chips. But put on hold to work 
+#         on the version with inifinite tile generator. All here should work if 
+#         config file points to directories with chips.
+##########################
+
 library("config")
 
 #library(keras)
@@ -50,31 +60,12 @@ mask_test <- as.matrix(batch_test[[2]])
 plot(as.raster(mask_test[1,,,]))
 # rasterImage(as.raster(mask_test[1,,,]),0,0,128,128, alpha = 0.5)
 
-### testing infinite generator
-inf_test <- train_infinite_generator(image_path = config$TRAIN_IMG,
-                                     mask_path  = config$TRAIN_MSK,
-                                     image_size = config$IMAGE_SIZE,
-                                     batch_size = config$BATCH_SIZE)
-inf_batch <- inf_test()
-image_test <- as.matrix(inf_batch[[1]])
-plot(as.raster(image_test[1,,,]))
-# rasterImage(as.raster(image_test[1,,,]),0,0,128,128)
-mask_test <- as.matrix(inf_batch[[2]])
-plot(as.raster(mask_test[1,,,]))
-# rasterImage(as.raster(mask_test[1,,,]),0,0,128,128, alpha = 0.5)
-#########
-
 
 train_iterator <- py_iterator(train_generator(images_dir = config$TRAIN_IMG,
                                               masks_dir  = config$TRAIN_MSK,
                                               samples_index = train_index,
                                               batch_size = config$BATCH_SIZE,
                                               class_name = config$CLASS_NAME))
-
-train_infinite_iterator <- py_iterator(train_infinite_generator(image_path = config$TRAIN_IMG,
-                                                                mask_path  = config$TRAIN_MSK,
-                                                                image_size = config$IMAGE_SIZE,
-                                                                batch_size = config$BATCH_SIZE))
 
 val_iterator <- py_iterator(val_generator(images_dir = config$VAL_IMG,
                                           masks_dir = config$VAL_MSK,
@@ -107,27 +98,17 @@ callbacks_list <- list(
                             mode = "max" )
 )
 
-## fit with chip iterator
-# history <- model %>% fit_generator(
-#   train_iterator,
-#   steps_per_epoch = as.integer(length(train_index) / config$BATCH_SIZE), 
-#   epochs = config$EPOCHS, 
-#   validation_data = val_iterator,
-#   validation_steps = as.integer(length(val_index) / config$BATCH_SIZE),
-#   verbose = 1,
-#   callbacks = callbacks_list
-# )
-
-# fit with infinite generator
+# fit with chip iterator
 history <- model %>% fit_generator(
-  train_infinite_iterator,
-  steps_per_epoch = as.integer(config$AMT_TRAIN / config$BATCH_SIZE), 
-  epochs = config$EPOCHS, 
-  validation_data = train_infinite_iterator,
-  validation_steps = as.integer(config$AMT_TRAIN / config$BATCH_SIZE),
+  train_iterator,
+  steps_per_epoch = as.integer(length(train_index) / config$BATCH_SIZE),
+  epochs = config$EPOCHS,
+  validation_data = val_iterator,
+  validation_steps = as.integer(length(val_index) / config$BATCH_SIZE),
   verbose = 1,
   callbacks = callbacks_list
 )
+
 
 model %>% evaluate_generator(val_iterator, steps = 5)
 

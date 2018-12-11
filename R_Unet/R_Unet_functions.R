@@ -1,4 +1,11 @@
 # Read and augmentation functions -----------------------------------------------------
+## MDH add to read full image for infinite chip generator
+fullImagesRead <- function(image_file,
+                           mask_file) {
+  img <- image_read(image_file)
+  mask <- image_read(mask_file)
+  return(list(img = img, mask = mask))
+}
 
 imagesRead <- function(image_file,
                        mask_file,
@@ -50,6 +57,56 @@ mask2arr <- function(mask,
   result <- t(as.numeric(mask[[1]])[, , 1]) # transpose
   array_reshape(result, c(1, target_width, target_height, 1))
 }
+
+## MDH - function for creating infinite chip generator for Keras
+train_infinite_generator <- function(image_path, 
+                                     mask_path, 
+                                     image_size,
+                                     batch_size) {
+  # read image once.
+  x_y_imgs_FULL <- fullImagesRead(image_file = image_path,
+                                  mask_file = mask_path)
+  img_x_dim <- image_info(x_y_imgs_FULL$img)$width
+  img_y_dim <- image_info(x_y_imgs_FULL$img)$height
+  
+  # do the same for mask
+  
+  function() {
+    
+    # now loop over image and mask for 1:batch_size
+    x_y_batch <- foreach(i = 1:batch_size) %dopar% {
+      
+      ### EXTRACT TILE HERE
+      rnd_x_UL <- sample(0:img_x_dim-image_size,1)
+      rnd_y_UL <- sample(0:img_y_dim-image_size,1)
+      
+      # could be done as apply function probably, doing this for now
+      ### geometry string = "width x height + width offset + height offset" all from upper-left corner
+      x_chip <- magick::image_crop(x_y_imgs_FULL$img, 
+                                   paste0(image_size,"x",image_size,"+",rnd_x_UL,"+",rnd_y_UL))
+      y_chip <- magick::image_crop(x_y_imgs_FULL$mask, 
+                                   paste0(image_size,"x",image_size,"+",rnd_x_UL,"+",rnd_y_UL))
+      
+      # augmentation
+      #x_y_imgs$img <- randomBSH(x_y_imgs$img)
+      
+      # return as arrays
+      x_y_arr <- list(x = img2arr(x_chip),
+                      y = mask2arr(y_chip))
+    }
+    
+    x_y_batch <- purrr::transpose(x_y_batch)
+    
+    x_batch <- do.call(abind, c(x_y_batch$x, list(along = 1)))
+    
+    y_batch <- do.call(abind, c(x_y_batch$y, list(along = 1)))
+    
+    result <- list(keras_array(x_batch), 
+                   keras_array(y_batch))
+    return(result)
+  }
+}
+
 
 train_generator <- function(images_dir, 
                             samples_index,
