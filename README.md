@@ -2,19 +2,20 @@
 Unet implementation in R flavor of Keras
 
 
-## Starting point for a translating the unet CNN to R 
-![Alt text](images/example_mask.png?raw=true "Title")
-![Alt text](images/example_prob.png?raw=true "Title")
+## Semantic segmentation on aerial imagery
+![Alt text](images/example_mask.png?raw=true "Title") ![Alt text](images/example_prob.png?raw=true "Title")
+
+## infinite training chip generator
+
+## on-the-fly image and mask augmentation
+![Alt text](images/augmentation1.png?raw=true "Title") ![Alt text](images/augmentation2.png?raw=true "Title") ![Alt text](images/augmentation3.png?raw=true "Title")
 
 
 ## TODO:
 
-
-* Image augmentation
-
 * somehow split out training image vs val image
 
-* Test additional archtecture
+* Test additional architectures
 
 * Test Time Augmenting, flipping, mirror, etc... (large area prediction)
 
@@ -32,4 +33,4 @@ Unet implementation in R flavor of Keras
   * https://github.com/keras-team/keras/issues/3059
   * https://keras.io/preprocessing/image/
   * https://github.com/rstudio/keras/blob/707427fa1f8e192e662b209e63fb962e99ba8fbf/vignettes/examples/cifar10_cnn.R
-  
+  * https://keras.rstudio.com/reference/image_data_generator.html
