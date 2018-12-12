@@ -28,7 +28,7 @@ val_infinite_iterator <- py_iterator(train_infinite_generator(image_path = confi
                                                               image_size = config$IMAGE_SIZE,
                                                               batch_size = config$BATCH_SIZE,
                                                               epochs = config$EPOCHS,
-                                                              amt_train = config$AMT_TRAIN,
+                                                              amt_train = config$AMT_VAL,
                                                               use_augmentation = FALSE,
                                                               mode = "validate"))
 
@@ -36,9 +36,9 @@ predict_generator <- train_infinite_generator(image_path = config$VAL_IMG,
                                               mask_path  = config$VAL_MSK,
                                               image_size = config$IMAGE_SIZE,
                                               epochs = 1,
-                                              amt_train = config$AMT_VAL,
+                                              amt_train = config$AMT_PREDICT,
                                               use_augmentation = FALSE,
-                                              batch_size = 10,
+                                              batch_size = config$AMT_PREDICT,
                                               mode = "predict")
 # Training -----------------------------------------------------
 

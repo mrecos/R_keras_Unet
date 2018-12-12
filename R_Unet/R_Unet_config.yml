@@ -13,6 +13,7 @@ default:
 
     AMT_TRAIN: 280
     AMT_VAL: 50
+    AMT_PREDICT: 5
     
     # Image Augmentation
     USE_AUGMENTATION: True
@@ -49,6 +50,7 @@ testing:
   BATCH_SIZE: 4
   AMT_TRAIN: 40
   AMT_VAL: 7
+  AMT_PREDICT: 5
   
 pre_chip:
     # Image and mask locations for already chipped image iterator
