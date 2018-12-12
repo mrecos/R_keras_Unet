@@ -33,7 +33,7 @@ predict_generator <- train_infinite_generator(image_path = config$VAL_IMG,
                                               batch_size = 10)
 # Training -----------------------------------------------------
 
-tensorboard("logs_r")
+# tensorboard("logs_r")
 
 callbacks_list <- list(
   callback_tensorboard("logs_r"),
@@ -70,7 +70,7 @@ model %>% evaluate_generator(val_infinite_iterator, steps = 5)
 
 predict_batch <- as.matrix(predict_generator()[[1]])
 preds <- model %>% predict(predict_batch, steps = 1)
-plot_pred_tensor_overlay(preds, predict_batch, 1, alpha = 0.45, mask=TRUE)
+plot_pred_tensor_overlay(preds, predict_batch, 1, alpha = 0.45, mask=FALSE)
 
 
 

@@ -4,7 +4,7 @@ default:
     USE_HILL: True
     NORM_IMAGES: True
     NUM_CLASSES: 1
-    CLASS_NAME: "Structures"
+    CLASS_NAME: "Buildings"
 
     EPOCHS: 5
     N_STEPS: 1
@@ -44,7 +44,7 @@ default:
     
 testing:
   IMAGE_SIZE: 224
-  EPOCHS: 100
+  EPOCHS: 20
   N_STEPS: 1
   BATCH_SIZE: 4
   AMT_TRAIN: 256

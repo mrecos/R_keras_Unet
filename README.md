@@ -3,7 +3,14 @@ Unet implementation in R flavor of Keras
 
 
 ## Semantic segmentation on aerial imagery
+
+
+### Buildings
 ![Alt text](images/example_prob.png?raw=true "Title") ![Alt text](images/example_mask.png?raw=true "Title")
+
+
+### Roads
+![Alt text](images/Roads_prob.png?raw=true "Title") ![Alt text](images/roads_mask.png?raw=true "Title")
 
 ## infinite training chip generator
 
@@ -14,6 +21,20 @@ Unet implementation in R flavor of Keras
 ## TODO:
 
 * somehow split out training image vs val image
+  * add stride/padding/offset and train/val split values to config
+  * add function to make all possible overlapping tile UL coords
+  * split all-possible into train/val based on config value
+  * only pull infinite chip from train list of possible UL corner coords
+  * has to check to see if all-possble coords exist, but DOES NOT KNOW if you changed dim, need to make it aware
+    * ran into this bug before b/c no notice of using old data. add message when ussing old data
+  * add option to config to reser the all-possble train/val splits
+  * has to be able to also function as it does now where split% == 0 so train/val randomly from same of seperate study area images
+  * Alternative to random select of train/val set (best in Kfolds CV) is to have full train/val images or either seperate geographies or strips/sections/blocks of single geography where train is NA where Val has data.
+  
+* add functionality to record dice/jaccard by batch and chip coords to reconstruct error map
+  * somehow write out coords form batch and then join to error metric of that batch.
+  
+* image normalization to dataset mean/variance (in config)
 
 * Test additional architectures
 
