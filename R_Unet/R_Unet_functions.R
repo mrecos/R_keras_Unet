@@ -54,6 +54,8 @@ train_infinite_generator <- function(image_path,
                                      mask_path, 
                                      image_size,
                                      batch_size,
+                                     amt_train,
+                                     epochs = 1,
                                      use_augmentation = FALSE,
                                      augment_args = NULL,
                                      mode = c("train","validate","predict")) {
@@ -63,9 +65,9 @@ train_infinite_generator <- function(image_path,
   }
   
   ## create log to record selected chip UL-corner coords (coul dbe moved to a make coord log function IF TRUE)
-  # coord_file_name <- paste0("./logs_r/","coordinates_",mode,"_",format(Sys.time(), "%M-%H_%d_%m_%Y"),".csv")
-  # file.create(coord_file_name)
-  # write(paste("x_coords","y_coord","mode",sep=","), file = coord_file_name, append = TRUE)
+  coord_file_name <- paste0("./logs_r/","coordinates_",mode,"_",format(Sys.time(), "%M-%H_%d_%m_%Y"),".csv")
+  file.create(coord_file_name)
+  write(paste("x_coords","y_coord","batch_i","step","epoch","mode",sep=","), file = coord_file_name, append = TRUE)
   
   # FULL read image and mask once
   x_y_imgs_FULL <- fullImagesRead(image_file = image_path,
@@ -73,18 +75,27 @@ train_infinite_generator <- function(image_path,
   img_x_dim <- image_info(x_y_imgs_FULL$img)$width
   img_y_dim <- image_info(x_y_imgs_FULL$img)$height
   
+  step_counter = 0 # prepare counter
+  steps_per_epoch = (amt_train/batch_size) # calculate steps per batch
   function() {
+    ## some counters to keep track of coordinate pairs.
+    step_counter <<- step_counter + 1 # use global assign to increment each call to this function
+    step  <- step_counter %% steps_per_epoch # keep number of steps 
+    step  <- ifelse(step == 0, steps_per_epoch, step) # fix case when counter == steps
+    epoch <- ceiling(step_counter / steps_per_epoch) # increment of epochs counter
+    
     # now loop over image and mask for 1:batch_size
-    x_y_batch <- foreach(i = 1:batch_size) %dopar% {  # DOPAR, may be issue in future
+    x_y_batch <- vector(mode = "list", length = batch_size)
+    #x_y_batch <- foreach(i = 1:batch_size) %dopar% {  # DOPAR, may be issue in future
+    for(i in seq_len(batch_size)){
       
       ### Random sample for chip upper-left corner image coordinates
       rnd_x_UL <- sample(0:img_x_dim-image_size,1)
       rnd_y_UL <- sample(0:img_y_dim-image_size,1)
       
       # write selected coordinates to log
-      ## NEEDS EPOCH/step NUMBER TO BE USEFUL
-      #cat(paste(rnd_x_UL,rnd_y_UL,mode),"\n")
-      #write(paste(rnd_x_UL,rnd_y_UL,mode,sep=","), file = coord_file_name, append = TRUE)
+      #cat("\n",paste(rnd_x_UL,rnd_y_UL,i,step,epoch,mode,sep=","),"\n") # for testing
+      write(paste(rnd_x_UL,rnd_y_UL,i,step,epoch,mode,sep=","), file = coord_file_name, append = TRUE)
       
       # Extract chip from FULL image and mask (using same coordinates for both)
       ### geometry string = "width x height + width offset + height offset" all from upper-left corner
@@ -93,9 +104,11 @@ train_infinite_generator <- function(image_path,
       
       # Could do some form of pure image augmentation here (as opposed to with keras augmentor)
       
-      # return as arrays
+      # create as arrays
       x_y_arr <- list(x = img2arr(x_chip, target_width=image_size, target_height=image_size),
                       y = mask2arr(y_chip, target_width=image_size, target_height=image_size))
+      # add to batch results (modified below out of loop)
+      x_y_batch[[i]] <- x_y_arr
     }
     
     # reshape image matrices into list and the contatenate into x and y

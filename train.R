@@ -1,9 +1,9 @@
 library("config")
 library("magick")
 library("abind")
-library("parallel")
-library("doParallel")
-library("foreach")
+#library("parallel")
+#library("doParallel")
+#library("foreach")
 
 config <- config::get(config = "testing", file = "./R_Unet/R_Unet_config.yml")
 source(file = "./R_Unet/R_Unet_functions.R")
@@ -17,6 +17,8 @@ train_infinite_iterator <- py_iterator(train_infinite_generator(image_path = con
                                                                 mask_path  = config$TRAIN_MSK,
                                                                 image_size = config$IMAGE_SIZE,
                                                                 batch_size = config$BATCH_SIZE,
+                                                                epochs = config$EPOCHS,
+                                                                amt_train = config$AMT_TRAIN,
                                                                 use_augmentation = config$USE_AUGMENTATION,
                                                                 augment_args = config$AUGMENT_ARGS,
                                                                 mode = "train"))
@@ -25,12 +27,16 @@ val_infinite_iterator <- py_iterator(train_infinite_generator(image_path = confi
                                                               mask_path  = config$VAL_MSK,
                                                               image_size = config$IMAGE_SIZE,
                                                               batch_size = config$BATCH_SIZE,
+                                                              epochs = config$EPOCHS,
+                                                              amt_train = config$AMT_TRAIN,
                                                               use_augmentation = FALSE,
                                                               mode = "validate"))
 
 predict_generator <- train_infinite_generator(image_path = config$VAL_IMG,
                                               mask_path  = config$VAL_MSK,
                                               image_size = config$IMAGE_SIZE,
+                                              epochs = 1,
+                                              amt_train = config$AMT_VAL,
                                               use_augmentation = FALSE,
                                               batch_size = 10,
                                               mode = "predict")
@@ -66,7 +72,8 @@ history <- model %>% fit_generator(
   validation_data = val_infinite_iterator,
   validation_steps = as.integer(config$AMT_VAL / config$BATCH_SIZE),
   verbose = 1,
-  callbacks = callbacks_list
+  callbacks = callbacks_list,
+  workers = 0 # so that the precise number of images are generated
 )
 
 model %>% evaluate_generator(val_infinite_iterator, steps = 5)
