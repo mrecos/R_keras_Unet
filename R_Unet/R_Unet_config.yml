@@ -27,14 +27,9 @@ default:
     # Image and mask locations for single image inifinite chip generator
     TRAIN_IMG: 'C:/Project_files/SARA/TIFF/SARA_1ft/SARA_1ft_CROP.tif'
     TRAIN_MSK: 'C:/Project_files/SARA/IMAGE_TILES/binary_masks_1ft/SARA_2_mask.tif'
-    VAL_IMG:   'C:/Project_files/SARA/TIFF/SARA_1ft/SARA_1ft_CROP.tif'
-    VAL_MSK:   'C:/Project_files/SARA/IMAGE_TILES/binary_masks_1ft/SARA_2_mask.tif'
+    VAL_IMG:   'C:/Project_files/SARA/TIFF/SARA_1ft/SARA_1ft_CROP2_TEST.tif'
+    VAL_MSK:   'C:/Project_files/SARA/IMAGE_TILES/binary_masks_1ft_Crop2/SARA_2_mask.tif'
     
-    # Image and mask locations for already chipped image iterator
-    #TRAIN_IMG: 'C:/Users/matthew.d.harris/UNET_MRCNN_IMAGERY/OUTPUT/SARA_CROP_3chan_tif_1ft_train/tif'
-    #TRAIN_MSK: 'C:/Users/matthew.d.harris/UNET_MRCNN_IMAGERY/OUTPUT/SARA_CROP_3chan_tif_1ft_train/polygon'
-    #VAL_IMG:   'C:/Users/matthew.d.harris/UNET_MRCNN_IMAGERY/OUTPUT/SARA_CROP_3chan_tif_1ft_test/tif'
-    #VAL_MSK:   'C:/Users/matthew.d.harris/UNET_MRCNN_IMAGERY/OUTPUT/SARA_CROP_3chan_tif_1ft_test/polygon'
     SAVE_WEIGHTS_DIR: 'C:/Users/matthew.d.harris/ZF_UNET_224/weights'
 
     # Maximum number of ground truth instances to use in one image
@@ -49,8 +44,17 @@ default:
     
 testing:
   IMAGE_SIZE: 224
-  EPOCHS: 5
+  EPOCHS: 100
   N_STEPS: 1
-  BATCH_SIZE: 2
-  AMT_TRAIN: 50
-  AMT_VAL: 10
+  BATCH_SIZE: 4
+  AMT_TRAIN: 256
+  AMT_VAL: 80
+  
+pre_chip:
+    # Image and mask locations for already chipped image iterator
+    TRAIN_IMG: 'C:/Users/matthew.d.harris/UNET_MRCNN_IMAGERY/OUTPUT/SARA_CROP_3chan_tif_1ft_train/tif'
+    TRAIN_MSK: 'C:/Users/matthew.d.harris/UNET_MRCNN_IMAGERY/OUTPUT/SARA_CROP_3chan_tif_1ft_train/polygon'
+    VAL_IMG:   'C:/Users/matthew.d.harris/UNET_MRCNN_IMAGERY/OUTPUT/SARA_CROP_3chan_tif_1ft_test/tif'
+    VAL_MSK:   'C:/Users/matthew.d.harris/UNET_MRCNN_IMAGERY/OUTPUT/SARA_CROP_3chan_tif_1ft_test/polygon'
+
+

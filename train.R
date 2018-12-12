@@ -1,11 +1,9 @@
 library("config")
-#library(keras)
-library(magick)
-library(abind)
-#library(reticulate)
-library(parallel)
-library(doParallel)
-library(foreach)
+library("magick")
+library("abind")
+library("parallel")
+library("doParallel")
+library("foreach")
 
 config <- config::get(config = "testing", file = "./R_Unet/R_Unet_config.yml")
 source(file = "./R_Unet/R_Unet_functions.R")
@@ -13,7 +11,6 @@ source(file = "./R_Unet/R_Unet.R")
 
 model <- get_unet_128(input_shape = c(config$IMAGE_SIZE, config$IMAGE_SIZE, config$N_CHANNELS),
                       num_classes = config$NUM_CLASSES)
-
 
 # Create Interators ---------------------------------------------
 train_infinite_iterator <- py_iterator(train_infinite_generator(image_path = config$TRAIN_IMG,
@@ -23,14 +20,14 @@ train_infinite_iterator <- py_iterator(train_infinite_generator(image_path = con
                                                                 use_augmentation = config$USE_AUGMENTATION,
                                                                 augment_args = config$AUGMENT_ARGS))
 
-val_infinite_iterator <- py_iterator(train_infinite_generator(image_path = config$TRAIN_IMG,
-                                                              mask_path  = config$TRAIN_MSK,
+val_infinite_iterator <- py_iterator(train_infinite_generator(image_path = config$VAL_IMG,
+                                                              mask_path  = config$VAL_MSK,
                                                               image_size = config$IMAGE_SIZE,
                                                               batch_size = config$BATCH_SIZE,
                                                               use_augmentation = FALSE))
 
-predict_generator <- train_infinite_generator(image_path = config$TRAIN_IMG,
-                                              mask_path  = config$TRAIN_MSK,
+predict_generator <- train_infinite_generator(image_path = config$VAL_IMG,
+                                              mask_path  = config$VAL_MSK,
                                               image_size = config$IMAGE_SIZE,
                                               use_augmentation = FALSE,
                                               batch_size = 10)
@@ -73,7 +70,7 @@ model %>% evaluate_generator(val_infinite_iterator, steps = 5)
 
 predict_batch <- as.matrix(predict_generator()[[1]])
 preds <- model %>% predict(predict_batch, steps = 1)
-plot_pred_tensor_overlay(preds, predict_batch, 1, alpha = 0.45, mask=FALSE)
+plot_pred_tensor_overlay(preds, predict_batch, 1, alpha = 0.45, mask=TRUE)
 
 
 

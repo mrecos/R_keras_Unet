@@ -3,7 +3,7 @@ Unet implementation in R flavor of Keras
 
 
 ## Semantic segmentation on aerial imagery
-![Alt text](images/example_mask.png?raw=true "Title") ![Alt text](images/example_prob.png?raw=true "Title")
+![Alt text](images/predict_prob1.png?raw=true "Title") ![Alt text](images/predict_mask1.png?raw=true "Title")
 
 ## infinite training chip generator
 
