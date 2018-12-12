@@ -55,11 +55,17 @@ train_infinite_generator <- function(image_path,
                                      image_size,
                                      batch_size,
                                      use_augmentation = FALSE,
-                                     augment_args = NULL) {
+                                     augment_args = NULL,
+                                     mode = c("train","validate","predict")) {
   ## error catch
   if(isTRUE(use_augmentation)){
     try(if(is.null(augment_args)) stop("Error: Must supply a list of augmentation arguments."))
   }
+  
+  ## create log to record selected chip UL-corner coords (coul dbe moved to a make coord log function IF TRUE)
+  # coord_file_name <- paste0("./logs_r/","coordinates_",mode,"_",format(Sys.time(), "%M-%H_%d_%m_%Y"),".csv")
+  # file.create(coord_file_name)
+  # write(paste("x_coords","y_coord","mode",sep=","), file = coord_file_name, append = TRUE)
   
   # FULL read image and mask once
   x_y_imgs_FULL <- fullImagesRead(image_file = image_path,
@@ -74,6 +80,11 @@ train_infinite_generator <- function(image_path,
       ### Random sample for chip upper-left corner image coordinates
       rnd_x_UL <- sample(0:img_x_dim-image_size,1)
       rnd_y_UL <- sample(0:img_y_dim-image_size,1)
+      
+      # write selected coordinates to log
+      ## NEEDS EPOCH/step NUMBER TO BE USEFUL
+      #cat(paste(rnd_x_UL,rnd_y_UL,mode),"\n")
+      #write(paste(rnd_x_UL,rnd_y_UL,mode,sep=","), file = coord_file_name, append = TRUE)
       
       # Extract chip from FULL image and mask (using same coordinates for both)
       ### geometry string = "width x height + width offset + height offset" all from upper-left corner

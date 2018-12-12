@@ -44,11 +44,11 @@ default:
     
 testing:
   IMAGE_SIZE: 224
-  EPOCHS: 20
+  EPOCHS: 1
   N_STEPS: 1
-  BATCH_SIZE: 4
-  AMT_TRAIN: 256
-  AMT_VAL: 80
+  BATCH_SIZE: 1
+  AMT_TRAIN: 1
+  AMT_VAL: 7
   
 pre_chip:
     # Image and mask locations for already chipped image iterator

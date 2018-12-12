@@ -18,19 +18,22 @@ train_infinite_iterator <- py_iterator(train_infinite_generator(image_path = con
                                                                 image_size = config$IMAGE_SIZE,
                                                                 batch_size = config$BATCH_SIZE,
                                                                 use_augmentation = config$USE_AUGMENTATION,
-                                                                augment_args = config$AUGMENT_ARGS))
+                                                                augment_args = config$AUGMENT_ARGS,
+                                                                mode = "train"))
 
 val_infinite_iterator <- py_iterator(train_infinite_generator(image_path = config$VAL_IMG,
                                                               mask_path  = config$VAL_MSK,
                                                               image_size = config$IMAGE_SIZE,
                                                               batch_size = config$BATCH_SIZE,
-                                                              use_augmentation = FALSE))
+                                                              use_augmentation = FALSE,
+                                                              mode = "validate"))
 
 predict_generator <- train_infinite_generator(image_path = config$VAL_IMG,
                                               mask_path  = config$VAL_MSK,
                                               image_size = config$IMAGE_SIZE,
                                               use_augmentation = FALSE,
-                                              batch_size = 10)
+                                              batch_size = 10,
+                                              mode = "predict")
 # Training -----------------------------------------------------
 
 # tensorboard("logs_r")
