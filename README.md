@@ -8,7 +8,7 @@ Unet implementation in R flavor of Keras
 ## infinite training chip generator
 
 ## on-the-fly image and mask augmentation
-![Alt text](images/augmentation1.png?raw=true "Title") ![Alt text](images/augmentation2.png?raw=true "Title") ![Alt text](images/augmentation3.png?raw=true "Title")
+![Alt text](images/augment1.png?raw=true "Title") ![Alt text](images/augment2.png?raw=true "Title") ![Alt text](images/augment3.png?raw=true "Title")
 
 
 ## TODO:
