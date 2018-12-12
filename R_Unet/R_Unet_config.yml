@@ -13,6 +13,16 @@ default:
 
     AMT_TRAIN: 280
     AMT_VAL: 50
+    
+    # Image Augmentation
+    USE_AUGMENTATION: True
+    AUGMENT_ARGS: !expr list(rotation_range=180,
+                             width_shift_range=0.1,
+                             height_shift_range=0.1,
+                             zoom_range=0.2,
+                             fill_mode="reflect",
+                             horizontal_flip=TRUE,
+                             vertical_flip=TRUE)
 
     # Image and mask locations for single image inifinite chip generator
     TRAIN_IMG: 'C:/Project_files/SARA/TIFF/SARA_1ft/SARA_1ft_CROP.tif'
@@ -42,5 +52,5 @@ testing:
   EPOCHS: 5
   N_STEPS: 1
   BATCH_SIZE: 2
-  AMT_TRAIN: 200
-  AMT_VAL: 50
+  AMT_TRAIN: 50
+  AMT_VAL: 10
