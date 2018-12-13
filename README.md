@@ -36,6 +36,8 @@ Unet implementation in R flavor of Keras
   * did this with a custom callback, but only records training dice coef because validation is only at end of epoch
   * create second validation iterator to get coords of validation after model fit
     * keep first val iterator coords just to visualize randomness; could set to not log coords later.
+    * post-model-fit validation loop or mapping moved into own script. Still need to proof chip coords code
+    * Then work on train/val all-possible coords lists to use instead...
   
 * image normalization to dataset mean/variance (in config)
 

@@ -21,7 +21,8 @@ train_infinite_iterator <- py_iterator(train_infinite_generator(image_path = con
                                                                 amt_train = config$AMT_TRAIN,
                                                                 use_augmentation = config$USE_AUGMENTATION,
                                                                 augment_args = config$AUGMENT_ARGS,
-                                                                mode = "train"))
+                                                                mode = "train",
+                                                                create_coord_logs = FALSE))
 
 val_infinite_iterator <- py_iterator(train_infinite_generator(image_path = config$VAL_IMG,
                                                               mask_path  = config$VAL_MSK,
@@ -30,7 +31,8 @@ val_infinite_iterator <- py_iterator(train_infinite_generator(image_path = confi
                                                               epochs = config$EPOCHS,
                                                               amt_train = config$AMT_VAL,
                                                               use_augmentation = FALSE,
-                                                              mode = "validate"))
+                                                              mode = "validate",
+                                                              create_coord_logs = FALSE))
 
 predict_generator <- train_infinite_generator(image_path = config$VAL_IMG,
                                               mask_path  = config$VAL_MSK,
@@ -39,7 +41,8 @@ predict_generator <- train_infinite_generator(image_path = config$VAL_IMG,
                                               amt_train = config$AMT_PREDICT,
                                               use_augmentation = FALSE,
                                               batch_size = config$AMT_PREDICT,
-                                              mode = "predict")
+                                              mode = "predict",
+                                              create_coord_logs = FALSE)
 # Training -----------------------------------------------------
 
 # tensorboard("logs_r")

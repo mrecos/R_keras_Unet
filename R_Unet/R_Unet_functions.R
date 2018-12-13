@@ -59,7 +59,7 @@ train_infinite_generator <- function(image_path,
                                      use_augmentation = FALSE,
                                      augment_args = NULL,
                                      mode = c("train","validate","predict","post_validate"),
-                                     create_coord_logs = TRUE) {
+                                     create_coord_logs = FALSE) {
   ## error catch
   if(isTRUE(use_augmentation)){
     try(if(is.null(augment_args)) stop("Error: Must supply a list of augmentation arguments."))
@@ -91,8 +91,8 @@ train_infinite_generator <- function(image_path,
     for(i in seq_len(batch_size)){
       
       ### Random sample for chip upper-left corner image coordinates
-      rnd_x_UL <- sample(0:img_x_dim-image_size,1)
-      rnd_y_UL <- sample(0:img_y_dim-image_size,1)
+      rnd_x_UL <- sample(0:(img_x_dim-image_size),1)
+      rnd_y_UL <- sample(0:(img_y_dim-image_size),1)
       
       if(isTRUE(create_coord_logs)){
         # write selected coordinates to log
@@ -104,6 +104,9 @@ train_infinite_generator <- function(image_path,
       ### geometry string = "width x height + width offset + height offset" all from upper-left corner
       x_chip <- magick::image_crop(x_y_imgs_FULL$img, paste0(image_size,"x",image_size,"+",rnd_x_UL,"+",rnd_y_UL))
       y_chip <- magick::image_crop(x_y_imgs_FULL$mask, paste0(image_size,"x",image_size,"+",rnd_x_UL,"+",rnd_y_UL))
+      
+      # to save chips (testing purposes for now)
+      #magick::image_write(x_chip, path = paste0("./weights_r/","x",rnd_x_UL,"_y",rnd_y_UL,".png"))
       
       # Could do some form of pure image augmentation here (as opposed to with keras augmentor)
       
