@@ -33,6 +33,9 @@ Unet implementation in R flavor of Keras
   
 * add functionality to record dice/jaccard by batch and chip coords to reconstruct error map
   * somehow write out coords form batch and then join to error metric of that batch.
+  * did this with a custom callback, but only records training dice coef because validation is only at end of epoch
+  * create second validation iterator to get coords of validation after model fit
+    * keep first val iterator coords just to visualize randomness; could set to not log coords later.
   
 * image normalization to dataset mean/variance (in config)
 

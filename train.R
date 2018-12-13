@@ -76,8 +76,12 @@ history <- model %>% fit_generator(
   callbacks = callbacks_list,
   workers = 0 # so that the precise number of images are generated
 )
+# write.csv(data.frame(dice_coef = train_dice_coef_by_batch$dice_coef), 
+#           file = paste0("./logs_r/","dice_by_batch_",format(Sys.time(), "%M-%H_%d_%m_%Y"),".csv"),
+#           row.names = FALSE)
 
-model %>% evaluate_generator(val_infinite_iterator, steps = 5)
+model %>% evaluate_generator(val_infinite_iterator, steps = 10,
+                             workers = 0) # so that the precise number of images are generated
 
 predict_batch <- as.matrix(predict_generator()[[1]])
 preds <- model %>% predict(predict_batch, steps = 1)
