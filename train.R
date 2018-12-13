@@ -61,7 +61,8 @@ callbacks_list <- list(
                             monitor = "val_python_function",
                             save_best_only = TRUE,
                             save_weights_only = TRUE, 
-                            mode = "max" )
+                            mode = "max" ),
+  train_dice_coef_by_batch <- dice_coef_by_batch$new()
 )
 
 # fit with infinite generator

@@ -67,7 +67,7 @@ train_infinite_generator <- function(image_path,
   ## create log to record selected chip UL-corner coords (coul dbe moved to a make coord log function IF TRUE)
   coord_file_name <- paste0("./logs_r/","coordinates_",mode,"_",format(Sys.time(), "%M-%H_%d_%m_%Y"),".csv")
   file.create(coord_file_name)
-  write(paste("x_coords","y_coord","batch_i","step","epoch","mode",sep=","), file = coord_file_name, append = TRUE)
+  write(paste("x_coords","y_coord","sample","step","epoch","mode",sep=","), file = coord_file_name, append = TRUE)
   
   # FULL read image and mask once
   x_y_imgs_FULL <- fullImagesRead(image_file = image_path,
@@ -281,3 +281,18 @@ plot_pred_tensor_overlay <- function(prediction, actual, indx = 1, cnfg = config
     theme(legend.key.width=unit(2, "cm"))
   return(p)
 }
+# Custom error metric logger -----------------------------------------
+# MDH - based on example here: # https://keras.rstudio.com/articles/training_callbacks.html
+# Records the training dice coef for each batch/step in training
+# cannot record validation dice coef b/c validation is only at end of epoch not each batch.
+dice_coef_by_batch <- R6::R6Class("DiceHistory",
+                                  inherit = KerasCallback,
+                                  
+                                  public = list(
+                                    
+                                    dice_coef = NULL,
+                                    
+                                    on_batch_end = function(batch, logs = list()) {
+                                      self$dice_coef <- c(self$dice_coef, logs[["dice_coef"]])
+                                    }
+                                  ))

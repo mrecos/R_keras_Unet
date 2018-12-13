@@ -59,3 +59,8 @@ Unet implementation in R flavor of Keras
 * fit_generator pulling too many images from data generator because workers >= 1
   * https://stackoverflow.com/questions/49267020/keras-flow-from-directory-saving-too-many-images-during-fit-generator-call
   
+* Custom callback to record metrics as end of each batch
+  * https://keras.rstudio.com/articles/training_callbacks.html
+  
+
+  
