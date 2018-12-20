@@ -1,8 +1,6 @@
 # R_keras_Unet
 Unet implementation in R flavor of Keras
 
-# HI ML/AI CALL!
-
 
 ## Semantic segmentation on aerial imagery
 
