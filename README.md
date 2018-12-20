@@ -1,6 +1,8 @@
 # R_keras_Unet
 Unet implementation in R flavor of Keras
 
+# HI ML/AI CALL!
+
 
 ## Semantic segmentation on aerial imagery
 
@@ -20,6 +22,7 @@ Unet implementation in R flavor of Keras
 
 ## TODO:
 
+* Need image loader to remove or sample from chips that have no target in them. They could be out of the study area or just lacking a thing.  For rare classes, this could be many/most random tiles. might want to think of better way.
 * somehow split out training image vs val image
   * add stride/padding/offset and train/val split values to config
   * add function to make all possible overlapping tile UL coords
@@ -35,9 +38,9 @@ Unet implementation in R flavor of Keras
   * somehow write out coords form batch and then join to error metric of that batch.
   * did this with a custom callback, but only records training dice coef because validation is only at end of epoch
   * create second validation iterator to get coords of validation after model fit
-    * keep first val iterator coords just to visualize randomness; could set to not log coords later.
-    * post-model-fit validation loop or mapping moved into own script. Still need to proof chip coords code
+    * post-model-fit validation loop for mapping moved into own script. 
     * Then work on train/val all-possible coords lists to use instead...
+    * Need to figure out mapping pixel coords to geographic coords
   
 * image normalization to dataset mean/variance (in config)
 
@@ -66,6 +69,9 @@ Unet implementation in R flavor of Keras
   
 * Custom callback to record metrics as end of each batch
   * https://keras.rstudio.com/articles/training_callbacks.html
+
+* Memory issues with magick package. Cannot load full SARA raster.
+  * https://github.com/ImageMagick/ImageMagick/issues/396
   
 
   
